@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const mongoose = require("mongoose");
 const Games = require("./models/games.js");
+const Lobby = require("./models/lobby.js")
 
 
 main().then(()=>{console.log("succuess")}).catch(err => console.log(err));
@@ -27,6 +28,16 @@ app.get("/api/gamedata",async (req,res)=>{
     
 })
 
+app.post("/api/lobby", async (req,res)=>{
+    let lobbydetail = req.body;
+    
+    const lobby = new Lobby(lobbydetail);
+    const savedLobby = await lobby.save();
+
+    console.log("Lobby created:", savedLobby);
+    res.status(201).json(savedLobby);
+})
+
 app.listen(5000, ()=>{
-    console.log("llistening");
+    console.log("listening");
 })

@@ -41,7 +41,7 @@ app.get("/",async (req,res)=>{
         }
     },
     {
-        image: "https://vignette.wikia.nocookie.net/pokemongo/images/8/87/Pokemon-GO-icon.png",
+        image: "https://imgs.search.brave.com/iklQqbxDCKNU_tDvIAdccS9yVJ4ALaBc1RyZ5-Pg8o8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMGY1YTAzOTUz/OWNjYmY2N2I5MGVi/YzQyYmU0YzQ3Yzhh/NjFjNmJkM2UwNDM5/YWY5ODA4MTEzNzUw/MzkxNzE0Yy9wb2tl/bW9uZ28uY29tLw",
         title: "Pokémon GO",
         filters: {
             modes: ["Raids", "GO Battle League", "Team GO Rocket", "Catching/Farming"],
@@ -50,7 +50,7 @@ app.get("/",async (req,res)=>{
         }
     },
     {
-        image: "https://m.media-amazon.com/images/I/41-A87tI75L.png",
+        image: "https://imgs.search.brave.com/jtOedlCZmL9R2p4t_rIt2tCZDW_id0MHxHoAr6QFUtM/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMDExMWJmMjI1/MzFhNDY3ZjViOTFh/MTM3OGYyZDdmYjIz/NjQyZmFhZDI1MTI5/MDg0MDRkN2QxOTFm/NDcyYzM4MS93d3cu/YmF0dGxlZ3JvdW5k/c21vYmlsZWluZGlh/LmNvbS8",
         title: "BGMI",
 
         filters: {
@@ -60,7 +60,7 @@ app.get("/",async (req,res)=>{
         }
     },
     {
-        image: "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
+        image: "https://imgs.search.brave.com/-287umXlR6B6sDfw8L4roXFzWDRvgnTRtJggLu0gqzw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYTE3MTAxZTdj/OTZkOGQ0MWY0NmI3/MGY0Y2ZmM2I2MTll/OGM5OGQxN2IyNTQ0/MzY1OTY4NjFlOTU2/YjlhM2I3OC93d3cu/bWluZWNyYWZ0Lm5l/dC8",
         title: "Minecraft",
         filters: {
             modes: ["Survival", "Creative", "Hardcore", "Bedwars", "Skywars"],
@@ -69,7 +69,7 @@ app.get("/",async (req,res)=>{
         }
     },
     {
-        image: "https://static.wikia.nocookie.net/apexlegends_gamepedia/images/0/0e/Apex_Legends_logo.png",
+        image: "https://imgs.search.brave.com/xXNxh7k8q9LORByB-QrtZXWvbrRxgnpy45H7EUZ27qA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wcmV2/aWV3LnJlZGQuaXQv/bWFkZS1hLWN1c3Rv/bS1hcGV4LWxvZ28t/aW0tdXNpbmctaXQt/YXMtdGhlLWRlc2t0/b3AtaWNvbi12MC1i/MGo3NzAwdGtpc2Ex/LnBuZz93aWR0aD02/NDAmY3JvcD1zbWFy/dCZhdXRvPXdlYnAm/cz05YzJlYmU2ZmZm/YzhlNzA3Y2NhODVm/ZGQ2ODEzMGUyYjNj/NjU2YmMy",
         title: "Apex Legends",
         filters: {
             modes: ["Battle Royale (Ranked)", "Trios", "Duos", "Mixtape"],
@@ -78,8 +78,9 @@ app.get("/",async (req,res)=>{
         }
     }
     ]
+    await Games.deleteMany({});
     const result = await Games.insertMany(gamesto)
-    res.send(result);
+    console.log(result);
 })
 
 

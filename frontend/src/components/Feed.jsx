@@ -1,4 +1,6 @@
+import { useState } from "react"
 import FeedCard from "./FeedCard"
+import NewLobbyForm from "./NewLobbyForm";
 export default function Feed(){
 
     let lobbyCards = [
@@ -52,10 +54,16 @@ export default function Feed(){
             rank: "Ace Dominator",
         }
     ]
+    const [lobbyForm,setLobbyForm]= useState(false);
+
+    let renderForm = ()=>{
+        setLobbyForm(true);
+    }
 
     return (
         <div className="flex flex-col items-center justify-start text-white w-[50vw] p-3   mt-4 ">
-            <button className="w-full py-2 bg-linear-to-r from-blue-500 to-purple-600">Host Squad</button>
+            <button className="w-full py-2 bg-linear-to-r from-blue-500 to-purple-600" onClick={renderForm}>Host Squad</button>
+            <NewLobbyForm display={lobbyForm} onClose={() => setLobbyForm(false)}/>
             <div className="w-full mt-6">
                 <p>Active Lobbies</p>
                 <div className="w-full grid grid-cols-3 ">
