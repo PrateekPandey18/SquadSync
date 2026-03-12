@@ -1,60 +1,33 @@
-import { useState } from "react"
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react"
+import io from "socket.io-client"
+import axios from "axios"
 import FeedCard from "./FeedCard"
 import NewLobbyForm from "./NewLobbyForm";
+
+const socket = io.connect("http://localhost:5000")
+
 export default function Feed(){
 
-    let lobbyCards = [
-        {
-            id: 1,
-            username: "demo",
-            gameName:"marvel rivals",
-            mode:"Ranked",
-            Rank:"platinum",
-        },
-        {
-            id: 2,
-            username: "TrainerRed",
-            gameName: "Pokémon GO",
-            mode: "Battle League",
-            Rank: "Ace",
-        },
-        {
-            id: 3,
-            username: "ChiefPekka",
-            gameName: "Clash of Clans",
-            mode: "Home Village",
-            Rank: "Titan I",
-        },
-        {
-            id: 4,
-            username: "JettMain99",
-            gameName: "Valorant",
-            mode: "Competitive",
-            Rank: "Diamond 3",
-        },
-        {
-            id: 5,
-            username: "WraithSweat",
-            gameName: "Apex Legends",
-            mode: "Battle Royale Ranked",
-            Rank: "Predator",
-        },
-        {
-            id: 6,
-            username: "SoloConqueror",
-            gameName: "BGMI",
-            mode: "Squad Ranked",
-            rank: "Ace Dominator",
-        },
-        {
-            id: 7,
-            username: "SoloConqueror",
-            gameName: "BGMI",
-            mode: "Squad Ranked",
-            rank: "Ace Dominator",
-        }
-    ]
+    const [lobbies,setLobbies]=useState([]);
     const [lobbyForm,setLobbyForm]= useState(false);
+
+    useEffect(()=>{
+        axios.get("http://localhost:5000/api/lobby")
+        .then(res=>setLobbies(res.data))
+
+        const handleNewLobby = (data) => {
+            setLobbies((prev) => [data, ...prev]);
+        };
+
+        socket.on("new_lobby", handleNewLobby);
+
+        return () => {
+            socket.off("new_lobby", handleNewLobby);
+        };
+    },[])
+
 
     let renderForm = ()=>{
         setLobbyForm(true);
@@ -67,8 +40,8 @@ export default function Feed(){
             <div className="w-full mt-6">
                 <p>Active Lobbies</p>
                 <div className="w-full grid grid-cols-3 ">
-                    {lobbyCards.map((card)=>{
-                        return <FeedCard key={card.id} card={card}/>
+                    {lobbies.map((card)=>{
+                        return <FeedCard key={card._id} card={card}/>
                     })}
 
                 </div>

@@ -17,11 +17,11 @@ export default function NewLobbyForm({display,onClose}){
     }
   })
 
-  const selectedGameId = watch("title");
+  const selectedGameTitle = watch("title");
   const currentSquadSize = watch("squadSize");
   const currentRankIndex = watch("rankIndex");
  
-const selectedGame = data.find((game) => game._id === selectedGameId);
+const selectedGame = data.find((game) => game.title === selectedGameTitle);
 
 
 useEffect(()=>{
@@ -36,7 +36,7 @@ useEffect(()=>{
         try{
             
             const res = await axios.post("http://localhost:5000/api/lobby",data);
-            
+            onClose();
         } catch (error) {
             console.log(error);
         }
@@ -57,7 +57,7 @@ useEffect(()=>{
                         <select {...register("title")} className="bg-[#0B0F19] ...">
                             <option value="">Choose a game</option>
                             {data.map((game) => (
-                            <option key={game._id} value={game._id}>
+                            <option key={game._id} value={game.title}>
                                 {game.title}
                             </option>
                             ))}
@@ -86,7 +86,7 @@ useEffect(()=>{
                                 <p>lobby title</p>
                                 <textarea {...register("description")}></textarea>
                                 <button onClick={onClose} type="button">Cancel</button>
-                                <button className="" type="submit">Create Squad</button>
+                                <button  type="submit">Create Squad</button>
 
                             
                         </div>
