@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form"
 import {useEffect } from "react"
+import { useNavigate } from 'react-router-dom';
 import axios from "axios"
 export default function NewLobbyForm({display,onClose}){
     const [data,setData] = useState([])
+    const navigate = useNavigate();
 
     const {
     register,
@@ -35,8 +37,10 @@ useEffect(()=>{
     const onSubmit = async (data) => {
         try{
             
-            const res = await axios.post("http://localhost:5000/api/lobby",data);
-            onClose();
+            const res = await axios.post("http://localhost:5000/api/lobby",data)
+            const newLobbyId = res.data._id; 
+        
+            navigate(`/lobby/${newLobbyId}`);
         } catch (error) {
             console.log(error);
         }

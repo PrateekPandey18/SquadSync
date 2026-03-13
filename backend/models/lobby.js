@@ -7,6 +7,9 @@ const lobbySchema = new Schema({
     squadSize:Number,
     rankIndex:Number,
     description:String,
+    chats: [{
+        message:String,
+    }],
 })
 
 const Lobby = mongoose.model("Lobby",lobbySchema);

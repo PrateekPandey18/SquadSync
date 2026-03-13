@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import axios from "axios"
 import io from "socket.io-client"
 import { useParams } from 'react-router-dom';
 import Navbar from "../components/navbar"
@@ -8,18 +9,23 @@ const socket = io.connect("http://localhost:5000")
 export default function Lobby(){
     const {roomId} = useParams()
     const [msg,setMsg] = useState("")
-    const [serverMsg,setServerMsg] = useState("")
-
+    // const [serverMsg,setServerMsg] = useState([])
+    const [serverMsg,setServerMsg] = useState([])
+    
     useEffect(()=>{
-        socket.emit("join_lobby_room",roomId);
-
-        
-
-        socket.on("receive_message",(data)=>{
-            setServerMsg(data);
+        axios.get(`http://localhost:5000/lobby/${roomId}`)
+        .then((res)=>{
+            setServerMsg(res.data)
         })
+
+        socket.emit("join_lobby_room",roomId);
+        socket.on("receive_message",(data)=>{
+            setServerMsg((prev)=>[...prev,data]);
+        })
+        
         return () => {
             socket.emit('leave-room', roomId);
+            socket.off("receive_message")
         };
     },[roomId])
 
@@ -28,6 +34,7 @@ export default function Lobby(){
             message:msg,
             room:roomId,
         })
+        setMsg("");
     }
 
     return (
@@ -45,10 +52,13 @@ export default function Lobby(){
                             <p>Squad Comms</p>
                         </div>
                         <div className="h-[80vh]">
-                            <h1>{serverMsg? serverMsg.message:null}</h1>
+                           {serverMsg.map((data,idx)=>(
+                             <h1 key={idx}>{data.message}</h1>
+                           ))}
+                           
                         </div>
                         <div className="h-[10vh]">
-                            <input type="text" onChange={(e)=>{setMsg(e.target.value)}}/>
+                            <input type="text" value={msg} onChange={(e)=>{setMsg(e.target.value)} }/>
                             <button onClick={sendMsg}> send message</button>
                         </div>
                     </div>

@@ -31,7 +31,9 @@ const io = new Server(server,{
 
 io.on("connection",(socket)=>{
 
-    socket.on("send_message",(data)=>{
+    socket.on("send_message", async (data)=>{
+        await Lobby.findByIdAndUpdate(data.room,{$push: {chats:{message:data.message}}})
+        
         io.to(data.room).emit("receive_message",data);
     })
 
@@ -54,14 +56,22 @@ app.get("/api/lobby",async(req,res)=>{
     res.status(200).json(lobbies);
 })
 
+app.get("/lobby/:id",async (req,res)=>{
+    let {id} = req.params;
+    let chats = await Lobby.findById(id)
+    console.log(chats.chats)
+    res.status(201).json(chats.chats)
+})
+
 app.post("/api/lobby", async (req,res)=>{
     let lobbydetail = req.body;
-    console.log(lobbydetail)
+    
     const lobby = new Lobby(lobbydetail);
     const savedLobby = await lobby.save();
+    console.log(savedLobby._id)
     io.emit("new_lobby",savedLobby);
-
-    console.log("Lobby created:", savedLobby);
+    res.status(201).json(savedLobby)
+   
 
 })
 
