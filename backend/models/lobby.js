@@ -7,8 +7,15 @@ const lobbySchema = new Schema({
     squadSize:Number,
     rankIndex:Number,
     description:String,
+    users:[{
+        type:String,
+    }],
     chats: [{
         message:String,
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        }
     }],
 })
 

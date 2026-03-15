@@ -5,7 +5,8 @@ const {Server} = require("socket.io")
 const cors = require('cors');
 const mongoose = require("mongoose");
 const Games = require("./models/games.js");
-const Lobby = require("./models/lobby.js")
+const Lobby = require("./models/lobby.js");
+const { asyncWrapProviders } = require("async_hooks");
 
 
 main().then(()=>{console.log("succuess")}).catch(err => console.log(err));
@@ -37,8 +38,12 @@ io.on("connection",(socket)=>{
         io.to(data.room).emit("receive_message",data);
     })
 
-    socket.on("join_lobby_room", (lobbyId)=>{
+    socket.on("join_lobby_room",async (lobbyId)=>{
         socket.join(lobbyId);
+        let user = await Lobby.findByIdAndUpdate(lobbyId,{$push: {users:"user"}})
+        socket.to(lobbyId).emit("user_joined",{
+            user: user,
+        })
     })
 })
 
@@ -58,9 +63,12 @@ app.get("/api/lobby",async(req,res)=>{
 
 app.get("/lobby/:id",async (req,res)=>{
     let {id} = req.params;
-    let chats = await Lobby.findById(id)
-    console.log(chats.chats)
-    res.status(201).json(chats.chats)
+    let lobby = await Lobby.findById(id)
+    console.log(lobby.chats,lobby.users)
+    res.status(201).json({
+        chats:lobby.chats,
+        users:lobby.users
+    })
 })
 
 app.post("/api/lobby", async (req,res)=>{
