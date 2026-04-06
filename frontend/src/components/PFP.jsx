@@ -1,4 +1,6 @@
+import { useAuth } from "../context/AuthContext"
 export default function PFP(){
+  const {currentUser} = useAuth()
     return(
         <div className="flex items-center h-8 w-fit min-w-35 not-even:bg-[#1a2134] border border-[#22293d] rounded-lg px-2 gap-2 shadow-sm">
       
@@ -13,7 +15,7 @@ export default function PFP(){
       
             <div className="flex flex-col justify-center overflow-hidden">
                 <span className="text-[11px] font-semibold text-white leading-none truncate">
-                Alex Rivera
+                {currentUser.username}
                 </span>
                 <div className="flex items-center gap-1 mt-0.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
