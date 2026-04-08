@@ -8,7 +8,8 @@ const userSchema = new Schema({
     password: String,
     lobbies:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Lobby"
+        ref: "Lobby",
+        
     }
 })
 

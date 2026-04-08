@@ -41,20 +41,61 @@ const io = new Server(server,{
 io.on("connection",(socket)=>{
 
     socket.on("send_message", async (data)=>{
-        await Lobby.findByIdAndUpdate(data.room,{$push: {chats:{message:data.message}}})
+        console.log(data)
+        await Lobby.findByIdAndUpdate(data.room,{$push: {chats:{message:data.message,sender:data.sender}}})
         
         io.to(data.room).emit("receive_message",data);
     })
 
-    socket.on("join_lobby_room",async (lobbyId)=>{
-        socket.join(lobbyId);
-        let user = await Lobby.findByIdAndUpdate(lobbyId,{$push: {users:"user"}})
-        socket.to(lobbyId).emit("user_joined",{
-            user: user,
-        })
+    socket.on("leave_lobby",async (data)=>{
+        const {room,user} = data;
+        const updatedLobby = await Lobby.findByIdAndUpdate(room,{$pull:{users:{user:user}}},{new:true}).populate('users.user',"username")
+        socket.to(room).emit("roster_update", updatedLobby.users);
+        socket.leave(room)
+    })
+
+    socket.on("disconnect",async ()=>{
+        if (socket.currentRoom && socket.currentUserId) {
+                
+                const updatedLobby = await Lobby.findOneAndUpdate(
+                    { _id: socket.currentRoom, "users.user": socket.currentUserId },
+                    { $set: { "users.$.online": false } }, 
+                    { new: true }
+                ).populate('users.user', 'username');
+
+                if (updatedLobby && updatedLobby.users) {
+                    socket.to(socket.currentRoom).emit("roster_update", updatedLobby.users);
+                }}
+    })
+    socket.on("ready",async(data)=>{
+        const {room,sender,status} = data;
+        let updatedLobby = await Lobby.findOneAndUpdate({_id:room,"users.user":sender}, {$set:{"users.$.ready": status}}).populate("users.user","username")
+        console.log(updatedLobby)
+        io.to(room).emit("roster_update", updatedLobby.users);
+    })
+
+    socket.on("join_lobby_room",async (data)=>{
+        const { roomId, user } = data;
+        socket.currentRoom = roomId;
+            socket.currentUserId = user;
+        // console.log(user)
+        socket.join(roomId);
+        let lobby = await Lobby.findById(roomId);
+        
+        const isAlreadyInLobby = lobby.users.some(u => u.user && u.user.toString() === user.toString());
+        if(isAlreadyInLobby){
+            let populatedLobby = await Lobby.findOneAndUpdate({_id:roomId, "users.user":user},{$set:{"users.$.online":true}},{new:true}).populate("users.user","username");
+            io.to(roomId).emit("roster_update", populatedLobby.users);
+        }
+        else if (lobby.users.length<lobby.squadSize){
+            let updatedLobby = await Lobby.findByIdAndUpdate(roomId,{$push:{users:{user:user,online:true}}},{new:true}).populate('users.user', 'username')
+            io.to(roomId).emit("roster_update", updatedLobby.users);
+         } 
+        else socket.emit("join_error", "redirect")
+        
     })
 })
-
+ 
 const saltRounds = 10;
 
 app.post("/signup", async (req,res) => {
@@ -88,7 +129,8 @@ app.post("/login",async (req,res)=>{
         secure:false,
         maxAge:3600000
     })
-    res.json({message:"logged in successfully"})
+    console.log({id:user._id,username:user.username,isAuthenticated:true})
+    res.json({id:user._id,username:user.username,isAuthenticated:true})
 
 })
 
@@ -108,18 +150,19 @@ app.get("/api/lobby",async(req,res)=>{
 
 app.get("/lobby/:id",async (req,res)=>{
     let {id} = req.params;
-    let lobby = await Lobby.findById(id)
-    console.log(lobby.chats,lobby.users)
+    let lobby = await Lobby.findById(id).populate("users","username")
+
+
     res.status(201).json({
-        chats:lobby.chats,
-        users:lobby.users
+        lobby:lobby
     })
 })
 
-app.post("/api/lobby", async (req,res)=>{
+app.post("/api/lobby", verifyToken,async (req,res)=>{
     let lobbydetail = req.body;
     
-    const lobby = new Lobby(lobbydetail);
+    const lobby = new Lobby({...lobbydetail,owner:req.user.id});
+    console.log(lobby)
     const savedLobby = await lobby.save();
     console.log(savedLobby._id)
     io.emit("new_lobby",savedLobby);

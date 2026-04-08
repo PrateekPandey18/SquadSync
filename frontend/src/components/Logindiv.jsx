@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form"
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
 import axios from "axios"
 export default function Logindiv(){
     const navigate = useNavigate();
@@ -9,9 +10,11 @@ export default function Logindiv(){
         watch,
         formState: { errors },
       } = useForm()
+      const {setCurrentUser} = useAuth()
 
       const onSubmit = async (data) => {
         const res = await axios.post("http://localhost:5000/login",data,{withCredentials:true});
+        setCurrentUser(res.data)
         navigate(`/homepage`)
       }
 

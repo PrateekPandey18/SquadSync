@@ -20,7 +20,7 @@ export default function ProtectedRoute({ children }) {
     // The "replace" prop ensures they can't use the back button to return to the protected route
     if (!currentUser) {
         return <Navigate to="/login" replace />;
-    }
+    } 
 
     // 4. If they are logged in, let them through to the component they asked for!
     return children;

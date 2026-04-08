@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const User = require("./user")
 const Schema = mongoose.Schema
 
 const lobbySchema = new Schema({
@@ -7,11 +8,29 @@ const lobbySchema = new Schema({
     squadSize:Number,
     rankIndex:Number,
     description:String,
-    users:[{
-        type:String,
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
+    users:[
+        { user:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"User",
+        },
+        online: {
+            type:Boolean,
+            default:true,
+        },
+        ready: {
+            type:Boolean,
+            default:false,
+        }
     }],
     chats: [{
         message:String,
+        sender:String,
         createdAt: {
             type: Date,
             default: Date.now,
