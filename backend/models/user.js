@@ -6,11 +6,11 @@ const userSchema = new Schema({
     username: String,
     email: String,
     password: String,
-    lobbies:{
+    lobbies:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Lobby",
         
-    }
+    }]
 })
 
 const User = new mongoose.model("User",userSchema)

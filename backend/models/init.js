@@ -10,7 +10,7 @@ async function main() {
 }
 app.get("/",async (req,res)=>{
     const gamesto = [
-        {image: "https://imgs.search.brave.com/rK3cMLIx8cKugAKPyxRFX2AEBv_wkBY2nn-5Xlt0_KY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pY29u/LWxpYnJhcnkuY29t/L2ltYWdlcy9jbGFz/aC1vZi1jbGFucy1p/Y29uLXBuZy9jbGFz/aC1vZi1jbGFucy1p/Y29uLXBuZy0xOC5q/cGc",
+        {image: "https://imgs.search.brave.com/HfygyCpB7s1nhJl4r4VgGJmjSCXYbg0o2OejB0QBox4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wbGF5/LWxoLmdvb2dsZXVz/ZXJjb250ZW50LmNv/bS9zRm1XZlliWXBf/MmVhN1ZSTVRud2Qz/Z2pJQnJQR1hIal9k/X2FiMV9rMXExcDJP/TWs0cmlHTUYxdnF4/ZGhPTk90VFlPdF9C/VnBrN2E0QVljS1U2/OExOR1E9dzI0MC1o/NDgwLXJ3",
         title: "Clash Of Clans",
         filters: {
             modes: ["Clan War League", "Capital Raids", "Farming", "Trophy Push"],

@@ -50,6 +50,7 @@ io.on("connection",(socket)=>{
     socket.on("leave_lobby",async (data)=>{
         const {room,user} = data;
         const updatedLobby = await Lobby.findByIdAndUpdate(room,{$pull:{users:{user:user}}},{new:true}).populate('users.user',"username")
+        await User.findByIdAndUpdate(user,{$pull:{lobbies:room}})
         socket.to(room).emit("roster_update", updatedLobby.users);
         socket.leave(room)
     })
@@ -67,6 +68,7 @@ io.on("connection",(socket)=>{
                     socket.to(socket.currentRoom).emit("roster_update", updatedLobby.users);
                 }}
     })
+
     socket.on("ready",async(data)=>{
         const {room,sender,status} = data;
         let updatedLobby = await Lobby.findOneAndUpdate({_id:room,"users.user":sender}, {$set:{"users.$.ready": status}}).populate("users.user","username")
@@ -88,7 +90,8 @@ io.on("connection",(socket)=>{
             io.to(roomId).emit("roster_update", populatedLobby.users);
         }
         else if (lobby.users.length<lobby.squadSize){
-            let updatedLobby = await Lobby.findByIdAndUpdate(roomId,{$push:{users:{user:user,online:true}}},{new:true}).populate('users.user', 'username')
+            let updatedLobby = await Lobby.findByIdAndUpdate(roomId,{$addToSet:{users:{user:user,online:true}}},{new:true}).populate('users.user', 'username')
+            await User.findByIdAndUpdate(user,{$addToSet:{lobbies:roomId}},{new:true})
             io.to(roomId).emit("roster_update", updatedLobby.users);
          } 
         else socket.emit("join_error", "redirect")
@@ -164,11 +167,18 @@ app.post("/api/lobby", verifyToken,async (req,res)=>{
     const lobby = new Lobby({...lobbydetail,owner:req.user.id});
     console.log(lobby)
     const savedLobby = await lobby.save();
+    await User.findByIdAndUpdate(req.user.id,{$addToSet:{lobbies:savedLobby._id}})
     console.log(savedLobby._id)
     io.emit("new_lobby",savedLobby);
     res.status(201).json(savedLobby)
    
 
+}) 
+app.get("/userLobbies",verifyToken,async(req,res)=>{
+
+    let user = await User.findById(req.user.id).populate("lobbies","title description")
+    console.log(user)
+    res.status(200).json(user.lobbies)
 })
 
 
