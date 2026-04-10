@@ -10,7 +10,21 @@ const userSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Lobby",
         
-    }]
+    }],
+    games:[{
+        game:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"Games"
+        },
+        rank:{
+            type: String,
+        },
+        rankIndex: Number
+    }],
+    bio:String,
+    avatar: String,
+    
+
 })
 
 const User = new mongoose.model("User",userSchema)

@@ -3,6 +3,7 @@ import Signup from "./pages/signup"
 import Login from "./pages/login"
 import Homepage from "./pages/Homepage"
 import Lobby from './pages/Lobby';
+import Dashboard from './pages/Dashboard';
 import axios from 'axios';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -16,6 +17,7 @@ axios.defaults.withCredentials = true;
           <Route path='/login' element={ <Login /> } />
           <Route path='/homepage' element={<ProtectedRoute><Homepage /></ProtectedRoute> } />
           <Route path="/lobby/:roomId" element={<ProtectedRoute><Lobby /></ProtectedRoute>} />
+          <Route path='/user/:id' element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

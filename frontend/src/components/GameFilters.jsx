@@ -1,9 +1,16 @@
 import { useState } from "react";
-export default function GameFilters({filters}){
+export default function GameFilters({search,filters}){
     if (!filters) return <p className="text-gray-500 p-4">Select a game to see filters</p>;
 
     const [rankIndex, setRankIndex] = useState(0);
+    const [gameMode,setGameMode] = useState(filters.modes[0] || "");
     const ranks = filters.rankOptions;
+    const handleSubmit = ()=>{
+        
+        search(gameMode,rankIndex)
+        
+    }
+    
 
 
     return(
@@ -18,8 +25,10 @@ export default function GameFilters({filters}){
                     <span>{mode}</span>
                     
                     <input 
-                        type="checkbox" 
+                        type="radio" 
                         id={`mode-${index}`} 
+                        name="btn"
+                        onChange={()=>setGameMode(filters.modes[index])}
                         value={mode} 
                     />
                     </label>
@@ -38,11 +47,11 @@ export default function GameFilters({filters}){
                 max={ranks.length - 1}
                 step="1"
                 value={rankIndex}
-                onChange={(e) => setRankIndex(e.target.value)}
+                onChange={(e) => setRankIndex(Number(e.target.value))}
                 className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
             </div>
-            <button className="w-full bg-amber-200">Submit</button>
+            <button className="w-full bg-amber-200" onClick={handleSubmit}>Submit</button>
         </div>
     )
 }

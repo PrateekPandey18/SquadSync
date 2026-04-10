@@ -146,7 +146,7 @@ app.get("/api/gamedata",async (req,res)=>{
     
 })
 
-app.get("/api/lobby",async(req,res)=>{
+app.get("/api/lobby",verifyToken,async(req,res)=>{
     let lobbies = await Lobby.find();
     res.status(200).json(lobbies);
 })
@@ -154,10 +154,12 @@ app.get("/api/lobby",async(req,res)=>{
 app.get("/lobby/:id",async (req,res)=>{
     let {id} = req.params;
     let lobby = await Lobby.findById(id).populate("users","username")
+    let user = await User.findById(req.user.id).populate("lobbies","title description").populate("games","title").populate("games.game")
 
 
     res.status(201).json({
-        lobby:lobby
+        lobby:lobby,
+        user:user,
     })
 })
 
@@ -180,6 +182,42 @@ app.get("/userLobbies",verifyToken,async(req,res)=>{
     console.log(user)
     res.status(200).json(user.lobbies)
 })
+app.get("/users/:id",verifyToken,async(req,res)=>{
+    let {id} = req.params;
+    console.log(id)
+    let user = await User.findById(id).populate("lobbies","title description").populate("games","title").populate("games.game")
+    let games = await Games.find()
+    console.log(games)
+    console.log(user)
+    res.status(200).json({user:user,games:games})
+})
+app.put("/users/:id", async (req, res) => {
+    const { username, bio, games } = req.body;
+    console.log(games)
+        const formattedGames = games.map(item => ({
+            game: item.game._id,   
+            rank: item.rank,       
+            rankIndex: item.rankIndex 
+        }));
+        const user = await User.findByIdAndUpdate(
+            req.params.id, 
+            {
+                username,
+                bio,
+                games: formattedGames
+            }, 
+            { new: true } 
+        )
+        .populate("games.game") 
+        .populate("lobbies", "title description");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // 3. Send back the updated user object
+        res.status(200).json({ user });
+});
 
 
 server.listen(5000, ()=>{

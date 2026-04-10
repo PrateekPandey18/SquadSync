@@ -1,8 +1,11 @@
 import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
 export default function PFP(){
+      
+    const navigate = useNavigate()
   const {currentUser} = useAuth()
     return(
-        <div className="flex items-center h-8 w-fit min-w-35 not-even:bg-[#1a2134] border border-[#22293d] rounded-lg px-2 gap-2 shadow-sm">
+        <div className="flex items-center h-8 w-fit min-w-35 not-even:bg-[#1a2134] border border-[#22293d] rounded-lg px-2 gap-2 shadow-sm " onClick={()=>navigate(`/user/${currentUser.id}`)}>
       
       <div className="h-6 w-6 shrink-0 rounded-full bg-slate-300 overflow-hidden">
         <img 
